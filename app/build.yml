@@ -1,0 +1,33 @@
+name: Build APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y python3-pip python3-setuptools python3-wheel \
+              git zip openjdk-17-jdk unzip wget \
+              libffi-dev libssl-dev autoconf automake \
+              libtool pkg-config zlib1g-dev
+
+          pip install --upgrade pip
+          pip install buildozer cython
+
+      - name: Build APK
+        run: |
+          buildozer -v android debug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v2
+        with:
+          name: DailyVerbs-APK
+          path: bin/*.apk
